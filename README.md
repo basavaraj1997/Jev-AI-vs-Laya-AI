@@ -1,118 +1,90 @@
 # TypeSafe AI (Jev) vs. Convai Innovations (Laya AI)
 
-> A comprehensive reference guide, architectural comparison, and local evaluation suite for **System 1 non-autoregressive AI decision engines**.
+> The definitive developer guide, architectural benchmark, and local execution reference for **System 1 non-autoregressive AI decision engines**.
 
 ---
 
 ## 📌 Executive Summary
 
-Traditional Large Language Models (LLMs) like GPT-4, Claude, or LLaMA are **System 2 / autoregressive generative models**: they generate natural language token-by-token. While versatile, they introduce:
-* **High latency** (typically 1–5+ seconds per request).
-* **High operational costs** (billing per input/output token).
-* **Output non-determinism & schema parsing fragility** (regular expression parsing, JSON repair overhead, hallucination risks).
+Traditional Large Language Models (LLMs) like GPT-4, Claude, or LLaMA are **System 2 / autoregressive generative models**: they generate natural language token-by-token. While versatile for creative prose and multi-step reasoning, they introduce significant operational friction for software-to-software pipelines:
+* **High latency:** Typically 1,000–5,000+ ms per query.
+* **High operational cost:** Expensive per-token billing for both input and output.
+* **Formatting fragility:** Prone to hallucinated keys, invalid JSON syntax, and regex/repair overhead.
 
 **TypeSafe AI (Jev)** and **Convai Innovations (Laya AI)** represent the new paradigm of **"System 1" Decision Models**:
-* **Non-autoregressive forward pass:** They evaluate text in a single inference step rather than generating tokens iteratively.
-* **Native typed predictions:** Directly return discrete categorical selections, continuous score intervals, and calibrated probabilities.
-* **Ultra-low latency:** 30–70 ms execution speed, suitable for real-time networking, microservice routing, and high-throughput pipelines.
+* **Non-autoregressive forward pass:** They evaluate an input state against questions in a single forward pass, skipping token-by-token generation.
+* **Native typed predictions:** Directly return discrete categorical selections, continuous score intervals, and calibrated probabilities without JSON parsing.
+* **Ultra-low latency:** **30–70 ms execution speed**, making them ideal for high-throughput microservice routing, real-time agent guardrails, and automated triage.
 
 ---
 
-## ⚖️ Head-to-Head Comparison
+## ⚖️ Head-to-Head Comparison: Jev AI vs. Laya AI
 
-| Attribute | TypeSafe AI (Jev) | Convai Innovations (Laya AI) |
+| Feature / Dimension | TypeSafe AI (Jev) | Convai Innovations (Laya AI) |
 | :--- | :--- | :--- |
 | **Model Type** | Proprietary SaaS | **Open-Weight (Apache 2.0)** |
-| **Hosting & Privacy** | Cloud API only (TypeSafe Cloud) | **100% Local (CPU / GPU) or Self-Hosted** |
-| **Architecture** | Proprietary non-autoregressive encoder | ModernBERT-large (~421M params) / mmBERT |
-| **Typical Latency** | ~70–150 ms (via network request) | **~30–40 ms (local execution)** |
-| **Hardware Required** | None (Cloud API) | Runs on consumer CPU or NVIDIA GPU |
-| **SDK / Library** | `typesafe-sdk` (Python, TypeScript) | `laya` (Python, PyTorch) |
-| **Cost Model** | Pay-per-query API subscription | **Free & Open-Source (Self-hosted)** |
-| **Offline Capability** | ❌ Requires internet & API Key | ✅ Works completely air-gapped / offline |
-| **Output Types** | `choice`, `score`, `noul` | `choice`, `score`, `noul` |
+| **Hosting & Privacy** | Cloud API only (TypeSafe Cloud) | **100% Local (CPU / GPU) or Self-Hosted Cloud** |
+| **Backbone Architecture**| Proprietary non-autoregressive encoder | ModernBERT-large (~421M params) / mmBERT |
+| **Typical Latency** | ~70–150 ms (via network call) | **~30–40 ms (local GPU) / sub-second (CPU)** |
+| **Hardware Required** | None (Hosted API) | Consumer CPU or NVIDIA GPU (cached locally) |
+| **SDK / Python Package**| `typesafe-sdk` | `laya` |
+| **Cost Model** | Pay-per-query API subscription | **Free & Open-Source (Zero API costs)** |
+| **Air-Gapped / Offline** | ❌ Requires internet & API key | ✅ Fully functional offline & air-gapped |
+| **Fine-Tuning Support** | Limited to vendor portal | Full weights access for custom training |
+| **Native Output Types** | `choice`, `score`, `noul` | `choice`, `score`, `noul` |
 
 ---
 
 ## 🧩 The Three Core "System 1" Primitives
 
-Both Jev and Laya structure their predictions into three primary mathematical decision types:
+Both Jev and Laya operate on three foundational mathematical decision types:
 
 1. **`choice` (Categorical Classification):**
-   * Selects the most probable category from a defined list of discrete options.
-   * Returns: Winning option label + full probability distribution over all candidates.
-   * *Use Cases:* Support ticket routing, intent detection, department assignment.
+   * Maps input context to the highest-probability option among a discrete set of criteria.
+   * Returns: Winning label (`choice`) + complete probability distribution (`probabilities`).
+   * *Common Workflows:* Support routing, department dispatch, intent classification.
 
-2. **`noul` (Boolean / Propositional Hypothesis Verification):**
-   * Evaluates the truth probability of a specific assertion or statement against the input text.
-   * Returns: A calibrated probability from `0.0` (definitely false) to `1.0` (definitely true).
-   * *Use Cases:* Guardrails, spam detection, refund eligibility check, PagerDuty alert triggers.
+2. **`noul` (Boolean Proposition / Hypothesis Verification):**
+   * Evaluates the truth probability of a natural-language statement against the context.
+   * Returns: Calibrated confidence float from `0.0` (definitely false) to `1.0` (definitely true).
+   * *Common Workflows:* Guardrails, compliance checks, P0 outage triggers, refund eligibility.
 
 3. **`score` (Ordinal Rubric Rating):**
-   * Estimates a continuous score or rank along ordered levels.
-   * Returns: Normalized score value and distribution across levels.
-   * *Use Cases:* Urgency scoring, customer sentiment, risk index, SLA priority.
+   * Evaluates input along ordered rubric levels (from index 0 upward).
+   * Returns: Continuous score metric + probability mass across rubric levels.
+   * *Common Workflows:* Urgency scoring, customer sentiment, risk index, SLA priority.
 
 ---
 
-## 🧪 55+ Test Cases & Evaluation Benchmark Suite
+## 🧪 55 Test Cases Benchmark & Evaluation Suite
 
-This repository includes **55 production test case input/output examples** spanning **8 enterprise domains**:
+This repository includes **55 production test cases** spanning **8 enterprise domains**:
 
-* 🗄️ **Infrastructure & IT Incidents** (Database pool exhaustion, BGP route flapping, pod crash loops, disk warnings)
+* 🗄️ **Infrastructure & IT Incidents** (Database pool exhaustion, BGP route flaps, pod crash loops, disk exhaustion)
 * 💳 **Billing & Financial Operations** (Duplicate chargebacks, tax invoice requests, SLA refund claims, pricing tiers)
-* 🛡️ **Cybersecurity & Threat Detection** (SQL injection, LLM prompt injection, Tor data exfiltration, BEC phishing)
+* 🛡️ **Cybersecurity & Threat Detection** (SQL injection, LLM prompt injection, Tor exfiltration, BEC phishing)
 * 💬 **Customer Experience & Support** (Account recovery, crash reports, feature requests, SLA breaches)
 * 📦 **E-Commerce & Order Fulfillment** (Porch piracy, incorrect SKU shipments, transit breakage, medical delivery alerts)
 * ⚙️ **DevOps & Engineering Pipelines** (ECR push auth failures, Terraform CIDR conflicts, canary rollbacks, flaky tests)
 * 🚨 **Content Moderation & Trust & Safety** (Crypto spam, doxxing & harassment, physical threats, piracy warez)
 * 🩺 **Healthcare & Clinical Triage** (Acute myocardial infarction, pediatric triage, toxic overdose, stroke code)
 
-Explore the full catalog in [**TEST_CASES.md**](TEST_CASES.md) or inspect the machine-readable dataset in [**test_cases.json**](test_cases.json).
+### Benchmark Resources
 
-* **Result Sheet (CSV)**: [`test_results.csv`](test_results.csv)
-* **Result Sheet (Markdown)**: [`EVALUATION_RESULTS.md`](EVALUATION_RESULTS.md)
+* **Catalog Documentation**: [**`TEST_CASES.md`**](TEST_CASES.md)
+* **Machine-Readable Dataset**: [**`test_cases.json`**](test_cases.json)
+* **Markdown Result Sheet**: [**`EVALUATION_RESULTS.md`**](EVALUATION_RESULTS.md)
+* **CSV Result Sheet**: [**`test_results.csv`**](test_results.csv)
 
 ### Running the Evaluation Suite
 
 ```bash
-# Automated evaluation across all 55 test cases
+# Automated validation across all 55 test cases
 python evaluate_dataset.py
 
-# Live evaluation against local Laya model weights
+# Force live evaluation against local Laya model weights
 python evaluate_dataset.py live
 ```
-
----
-
-## 🧾 Customer Order & Invoice Email Validation (Fuzzy Search + Laya AI)
-
-This suite validates realistic **customer order and invoice email inquiries** against ERP database ground truth records using **fuzzy string matching** combined with **Laya AI System 1 decision evaluation**.
-
-### The Pipeline Architecture
-
-1. **Email Entity Extraction**: Extracts Customer Name, Order ID, Invoice Reference, Shipping Address, Product Description, and Claimed Amount from unstructured customer emails.
-2. **ERP Database Comparison**: Queries the internal database ground truth.
-3. **Fuzzy String Similarity Metrics**:
-   * Customer Name Similarity ratio ($0.0 - 100.0\%$).
-   * Delivery Address Similarity ratio ($0.0 - 100.0\%$).
-   * Product Name Similarity ratio ($0.0 - 100.0\%$).
-   * Absolute Amount Difference ($\$$).
-   * Exact vs. Fuzzy Order ID resolution.
-4. **Laya AI Decision Engine**:
-   * `validation_verdict` (`choice`): `verified_match`, `minor_typo_accepted`, `address_mismatch`, `amount_discrepancy`, `unauthorized_party`, `order_not_found`.
-   * `requires_manual_agent_review` (`noul`): Boolean confidence whether human escalation is required.
-   * `risk_level` (`score`): `low_safe`, `medium_review`, `high_discrepancy`, `critical_fraud`.
-
-### Running the Order Validation Suite
-
-```bash
-python validate_customer_orders.py
-```
-
-* **Dataset**: [`order_validation_cases.json`](order_validation_cases.json)
-* **Result Sheet (CSV)**: [`order_validation_results.csv`](order_validation_results.csv)
-* **Result Sheet (Markdown)**: [`ORDER_VALIDATION_RESULTS.md`](ORDER_VALIDATION_RESULTS.md)
 
 ---
 
@@ -175,22 +147,18 @@ Because **Laya AI is open-weight**, it is ideal for local test environments, pri
 git clone https://github.com/basavaraj1997/Jev-AI-vs-Laya-AI.git
 cd Jev-AI-vs-Laya-AI
 
-# 2. Create virtual environment
+# 2. Create and activate virtual environment
 python -m venv .venv
+.\.venv\Scripts\Activate.ps1   # On Windows PowerShell
+# source .venv/bin/activate    # On Linux/macOS
 
-# 3. Activate virtual environment
-# Windows PowerShell:
-.\.venv\Scripts\Activate.ps1
-# Linux/macOS:
-source .venv/bin/activate
-
-# 4. Install dependencies
+# 3. Install dependencies
 pip install -r requirements.txt
 ```
 
 ### 2. Local Decision Script (`decision_engine.py`)
 
-Run the standalone decision script:
+Run the standalone decision script locally:
 
 ```bash
 python decision_engine.py
@@ -201,36 +169,36 @@ Code excerpt:
 ```python
 import laya
 
-# 1. Load model weights from Hugging Face (cached locally after first run)
+# 1. Load model checkpoint (downloads and caches locally on first run)
 agent = laya.load("convaiinnovations/laya")
 
-# 2. Define input state
+# 2. Define input state context
 state = {
-    "text": "CRITICAL: Database connection pool exhausted on prod-us-east-1. Checkout service returning HTTP 500."
+    "text": "CRITICAL: Database connection pool exhausted on prod-us-east-1. Web apps returning HTTP 500."
 }
 
-# 3. Define questions schema
-questions = [
-    ("service_domain", {
+# 3. Define schema with typed decision primitives
+questions = {
+    "routing_target": {
         "type": "choice",
-        "options": ["infrastructure", "billing", "frontend_ui", "auth"]
-    }),
-    ("trigger_pagerduty", {
+        "instructions": "Which engineering team should handle this incident?",
+        "criteria": ["sre_oncall", "billing_support", "frontend_team", "account_security"]
+    },
+    "is_p0_incident": {
         "type": "noul",
-        "statement": "This incident indicates a critical production blocker requiring on-call engineer intervention."
-    }),
-    ("severity_level", {
+        "instructions": "Does this message report a critical production outage causing total business disruption?"
+    },
+    "urgency_score": {
         "type": "score",
-        "levels": ["P4_low", "P3_medium", "P2_high", "P1_critical"]
-    })
-]
+        "instructions": "Rate the operational severity of this issue from low to critical.",
+        "criteria": ["low", "normal", "high", "critical"]
+    }
+}
 
-# 4. Execute non-autoregressive inference (~33ms)
+# 4. Predict decisions in a single non-autoregressive forward pass (~33ms)
 result = agent.predict(state, questions)
 
-print(f"Domain Assignment : {result.answers['service_domain'].best}")
-print(f"PagerDuty Alert   : {result.answers['trigger_pagerduty'].probability > 0.7}")
-print(f"Severity Score    : {result.answers['severity_level'].value}")
+print(result["answers"])
 ```
 
 ---
@@ -254,11 +222,8 @@ curl -X POST http://localhost:8000/predict \
     "questions": {
       "intent": {
         "type": "choice",
-        "options": ["renewal", "cancellation", "bug", "general"]
-      },
-      "requires_human": {
-        "type": "noul",
-        "statement": "Does this message require human representative involvement?"
+        "instructions": "What is the primary customer intent?",
+        "criteria": ["renewal", "cancellation", "bug", "general"]
       }
     }
   }'
@@ -266,17 +231,44 @@ curl -X POST http://localhost:8000/predict \
 
 ---
 
-## 🎯 When to Use Which?
+## 🔍 Keywords, Search Terms & R&D Taxonomy
+
+For developers, machine learning researchers, and architects exploring System 1 AI decision systems, this repository covers the most frequent queries and keywords:
+
+### 1. Model Names & Common Search Misspellings
+* **TypeSafe AI (Jev)**: `gev typesafe ai`, `jev ai`, `typesafe ai`, `typesafe-sdk`, `typesafe jev`, `typesafe ai python`, `Diogo Almeida TypeSafe`
+* **Convai Innovations (Laya)**: `convai laya`, `convai laya ai`, `laya ai mode`, `laya decision model`, `convaiinnovations/laya`, `laya python sdk`, `laya-multilingual`, `laya-typed-decisions`
+* **Comparisons**: `typesafe ai vs laya ai`, `jev vs laya`, `laya vs jev`, `open source alternative to typesafe ai`, `self-hosted jev alternative`
+
+### 2. Architecture & Performance Terminology
+* `System 1 AI` vs `System 2 AI` (fast, intuitive decision-making vs slow, generative reasoning)
+* `Non-autoregressive AI`, `non-autoregressive decision model`, `non-generative LLM`
+* `ModernBERT decision head`, `ModernBERT-large`, `mmBERT-base`, `encoder-based decision engine`
+* `Sub-100ms AI classification`, `sub-50ms model routing`, `low-latency AI triage`
+* `Single forward pass decision making`, `parallel transformer inference`
+
+### 3. Typed Primitives & Structured Outputs
+* `choice primitive` (categorical classification without hallucinations or regex repair)
+* `noul primitive` (calibrated boolean confidence, propositional truth testing)
+* `score primitive` (ordinal rubric expectations, continuous value scoring)
+* `calibrated probabilities in AI`, `guaranteed schema adherence`, `zero JSON repair`
+
+### 4. R&D & PoC Workflows
+* `System 1 AI PoC`, `System 1 AI R&D`, `local PoC for decision engine`
+* `AI agent guardrails low latency`, `real-time model router`, `automated P0 incident triage`
+* `Air-gapped AI classification`, `zero API cost enterprise decision engine`, `private data AI triage`
+
+---
+
+## 🎯 Architectural Selection Guide
 
 * **Choose Laya AI when:**
-  * You need complete data sovereignty (HIPAA, GDPR, internal company proprietary code/data).
-  * You want zero API recurring costs.
-  * You want to run in air-gapped environments or local edge devices.
-  * You want the ability to fine-tune weights for domain-specific taxonomy.
+  * You need **100% data sovereignty & privacy** (HIPAA, GDPR, internal company proprietary code/data).
+  * You want **zero recurring API subscription costs**.
+  * You require **offline, local, or air-gapped execution** on edge devices or private servers.
+  * You want access to model weights to **fine-tune** on proprietary internal taxonomies.
 
 * **Choose Jev (TypeSafe AI) when:**
-  * You prefer a fully managed cloud API with zero infrastructure management.
-  * You do not want to allocate local CPU or GPU memory for model weights.
-  * You require turnkey enterprise SLAs from TypeSafe AI.
-
-
+  * You want a **fully managed cloud API** with zero infrastructure management.
+  * You do not want to allocate local CPU or GPU memory for model checkpoints.
+  * You require turnkey enterprise SLAs and hosted scalability from TypeSafe AI.
