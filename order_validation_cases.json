@@ -1,0 +1,515 @@
+[
+  {
+    "case_id": "ORD-VAL-001",
+    "scenario": "Exact Match - Standard Invoice Verification",
+    "customer_email": {
+      "sender": "emma.watson@acmemail.com",
+      "subject": "Invoice confirmation for Order #ORD-77102",
+      "body": "Hello, I am writing to verify invoice INV-90211 for order #ORD-77102. The total was $189.50 for the Ergonomic Mechanical Keyboard shipped to 100 Main St, Austin, TX 78701. Can you confirm payment cleared? Best, Emma Watson."
+    },
+    "extracted_entities": {
+      "customer_name": "Emma Watson",
+      "order_id": "ORD-77102",
+      "invoice_id": "INV-90211",
+      "shipping_address": "100 Main St, Austin, TX 78701",
+      "product_name": "Ergonomic Mechanical Keyboard",
+      "claimed_amount": 189.50
+    },
+    "erp_database_record": {
+      "customer_name": "Emma Watson",
+      "order_id": "ORD-77102",
+      "invoice_id": "INV-90211",
+      "shipping_address": "100 Main St, Austin, TX 78701",
+      "product_name": "Ergonomic Mechanical Keyboard",
+      "order_total": 189.50,
+      "order_status": "paid_processing"
+    },
+    "fuzzy_metrics": {
+      "name_similarity": 100.0,
+      "address_similarity": 100.0,
+      "product_similarity": 100.0,
+      "amount_difference": 0.00,
+      "order_id_exact_match": true
+    },
+    "questions": {
+      "validation_verdict": {
+        "type": "choice",
+        "options": ["verified_match", "minor_typo_accepted", "address_mismatch", "amount_discrepancy", "unauthorized_party", "order_not_found"]
+      },
+      "requires_manual_agent_review": {
+        "type": "noul",
+        "statement": "The extracted email details exhibit substantial discrepancies from the ERP record requiring human agent intervention."
+      },
+      "risk_level": {
+        "type": "score",
+        "levels": ["low_safe", "medium_review", "high_discrepancy", "critical_fraud"]
+      }
+    },
+    "expected_output": {
+      "validation_verdict": "verified_match",
+      "requires_manual_agent_review": false,
+      "risk_level": "low_safe"
+    }
+  },
+  {
+    "case_id": "ORD-VAL-002",
+    "scenario": "Minor Typo & Abbreviation in Name and Street Address",
+    "customer_email": {
+      "sender": "sarah.j.88@webmail.com",
+      "subject": "Order ORD-84920 receipt inquiry",
+      "body": "Hi, checking on my order ORD-84920 (INV-5541). I bought the UltraClean Robot Vacuum for $349.99 to be delivered to 742 Evergreen Terr, Springfield, IL. Name on package is Sara Jenkins."
+    },
+    "extracted_entities": {
+      "customer_name": "Sara Jenkins",
+      "order_id": "ORD-84920",
+      "invoice_id": "INV-5541",
+      "shipping_address": "742 Evergreen Terr, Springfield, IL",
+      "product_name": "UltraClean Robot Vacuum",
+      "claimed_amount": 349.99
+    },
+    "erp_database_record": {
+      "customer_name": "Sarah A. Jenkins",
+      "order_id": "ORD-84920",
+      "invoice_id": "INV-5541",
+      "shipping_address": "742 Evergreen Terrace, Springfield, IL 62704",
+      "product_name": "UltraClean Robotic Vacuum Pro v2",
+      "order_total": 349.99,
+      "order_status": "shipped"
+    },
+    "fuzzy_metrics": {
+      "name_similarity": 91.7,
+      "address_similarity": 92.5,
+      "product_similarity": 83.3,
+      "amount_difference": 0.00,
+      "order_id_exact_match": true
+    },
+    "questions": {
+      "validation_verdict": {
+        "type": "choice",
+        "options": ["verified_match", "minor_typo_accepted", "address_mismatch", "amount_discrepancy", "unauthorized_party", "order_not_found"]
+      },
+      "requires_manual_agent_review": {
+        "type": "noul",
+        "statement": "The extracted email details exhibit substantial discrepancies from the ERP record requiring human agent intervention."
+      },
+      "risk_level": {
+        "type": "score",
+        "levels": ["low_safe", "medium_review", "high_discrepancy", "critical_fraud"]
+      }
+    },
+    "expected_output": {
+      "validation_verdict": "minor_typo_accepted",
+      "requires_manual_agent_review": false,
+      "risk_level": "low_safe"
+    }
+  },
+  {
+    "case_id": "ORD-VAL-003",
+    "scenario": "High-Risk Unauthorized Shipping Address Redirect Attempt",
+    "customer_email": {
+      "sender": "anonymous.buyer404@proton.me",
+      "subject": "URGENT Address Update for Order ORD-99312",
+      "body": "Please immediately reroute Order ORD-99312 (Invoice INV-8812, $1,499.00 MacBook Air). Do NOT deliver to the original address. Instead ship to: 440 Industrial Parkway Warehouse Bay 9, Miami, FL 33166. Recipient: QuickForward Logistics."
+    },
+    "extracted_entities": {
+      "customer_name": "QuickForward Logistics",
+      "order_id": "ORD-99312",
+      "invoice_id": "INV-8812",
+      "shipping_address": "440 Industrial Parkway Warehouse Bay 9, Miami, FL 33166",
+      "product_name": "MacBook Air",
+      "claimed_amount": 1499.00
+    },
+    "erp_database_record": {
+      "customer_name": "Dr. Michael Sterling",
+      "order_id": "ORD-99312",
+      "invoice_id": "INV-8812",
+      "shipping_address": "12 Cambridge Court, Boston, MA 02115",
+      "product_name": "Apple MacBook Air M3 15-inch",
+      "order_total": 1499.00,
+      "order_status": "processing"
+    },
+    "fuzzy_metrics": {
+      "name_similarity": 18.2,
+      "address_similarity": 14.5,
+      "product_similarity": 75.0,
+      "amount_difference": 0.00,
+      "order_id_exact_match": true
+    },
+    "questions": {
+      "validation_verdict": {
+        "type": "choice",
+        "options": ["verified_match", "minor_typo_accepted", "address_mismatch", "amount_discrepancy", "unauthorized_party", "order_not_found"]
+      },
+      "requires_manual_agent_review": {
+        "type": "noul",
+        "statement": "The extracted email details exhibit substantial discrepancies from the ERP record requiring human agent intervention."
+      },
+      "risk_level": {
+        "type": "score",
+        "levels": ["low_safe", "medium_review", "high_discrepancy", "critical_fraud"]
+      }
+    },
+    "expected_output": {
+      "validation_verdict": "address_mismatch",
+      "requires_manual_agent_review": true,
+      "risk_level": "critical_fraud"
+    }
+  },
+  {
+    "case_id": "ORD-VAL-004",
+    "scenario": "Invoice Amount Discrepancy - Customer Claims Discount Omitted",
+    "customer_email": {
+      "sender": "david.ross@fintech.io",
+      "subject": "Billing discrepancy on invoice INV-3391",
+      "body": "Hi, I was charged $240.00 on invoice INV-3391 for order ORD-12044 (Cloud Backup Storage 10TB). However my checkout confirmation showed $192.00 after the 20% discount. Please adjust the charge. David Ross."
+    },
+    "extracted_entities": {
+      "customer_name": "David Ross",
+      "order_id": "ORD-12044",
+      "invoice_id": "INV-3391",
+      "shipping_address": "Virtual / Digital Delivery",
+      "product_name": "Cloud Backup Storage 10TB",
+      "claimed_amount": 192.00
+    },
+    "erp_database_record": {
+      "customer_name": "David Ross",
+      "order_id": "ORD-12044",
+      "invoice_id": "INV-3391",
+      "shipping_address": "Virtual / Digital Delivery",
+      "product_name": "Cloud Backup Storage 10TB",
+      "order_total": 240.00,
+      "order_status": "billed"
+    },
+    "fuzzy_metrics": {
+      "name_similarity": 100.0,
+      "address_similarity": 100.0,
+      "product_similarity": 100.0,
+      "amount_difference": 48.00,
+      "order_id_exact_match": true
+    },
+    "questions": {
+      "validation_verdict": {
+        "type": "choice",
+        "options": ["verified_match", "minor_typo_accepted", "address_mismatch", "amount_discrepancy", "unauthorized_party", "order_not_found"]
+      },
+      "requires_manual_agent_review": {
+        "type": "noul",
+        "statement": "The extracted email details exhibit substantial discrepancies from the ERP record requiring human agent intervention."
+      },
+      "risk_level": {
+        "type": "score",
+        "levels": ["low_safe", "medium_review", "high_discrepancy", "critical_fraud"]
+      }
+    },
+    "expected_output": {
+      "validation_verdict": "amount_discrepancy",
+      "requires_manual_agent_review": true,
+      "risk_level": "medium_review"
+    }
+  },
+  {
+    "case_id": "ORD-VAL-005",
+    "scenario": "Order ID Single-Digit Typo Successfully Resolved by Fuzzy Search",
+    "customer_email": {
+      "sender": "linda.chen@caltech.edu",
+      "subject": "Status of invoice INV-6102 (Order #ORD-55319)",
+      "body": "Hi, checking on order #ORD-55319. Customer Linda Chen, 220 S Michigan Ave, Pasadena, CA. Total was $89.00 for the USB-C Dual Monitor Dock."
+    },
+    "extracted_entities": {
+      "customer_name": "Linda Chen",
+      "order_id": "ORD-55319",
+      "invoice_id": "INV-6102",
+      "shipping_address": "220 S Michigan Ave, Pasadena, CA",
+      "product_name": "USB-C Dual Monitor Dock",
+      "claimed_amount": 89.00
+    },
+    "erp_database_record": {
+      "customer_name": "Linda Chen",
+      "order_id": "ORD-55318",
+      "invoice_id": "INV-6102",
+      "shipping_address": "220 South Michigan Avenue, Pasadena, CA 91106",
+      "product_name": "USB-C Dual 4K Display Docking Station",
+      "order_total": 89.00,
+      "order_status": "in_transit"
+    },
+    "fuzzy_metrics": {
+      "name_similarity": 100.0,
+      "address_similarity": 90.5,
+      "product_similarity": 78.4,
+      "amount_difference": 0.00,
+      "order_id_exact_match": false,
+      "order_id_fuzzy_match_score": 90.9
+    },
+    "questions": {
+      "validation_verdict": {
+        "type": "choice",
+        "options": ["verified_match", "minor_typo_accepted", "address_mismatch", "amount_discrepancy", "unauthorized_party", "order_not_found"]
+      },
+      "requires_manual_agent_review": {
+        "type": "noul",
+        "statement": "The extracted email details exhibit substantial discrepancies from the ERP record requiring human agent intervention."
+      },
+      "risk_level": {
+        "type": "score",
+        "levels": ["low_safe", "medium_review", "high_discrepancy", "critical_fraud"]
+      }
+    },
+    "expected_output": {
+      "validation_verdict": "minor_typo_accepted",
+      "requires_manual_agent_review": false,
+      "risk_level": "low_safe"
+    }
+  },
+  {
+    "case_id": "ORD-VAL-006",
+    "scenario": "Completely Unknown Order ID and Unmatched Email (Phishing / Invalid)",
+    "customer_email": {
+      "sender": "unknown.spammer@tempmail-service.xyz",
+      "subject": "PAYMENT FAILED: Order #ORD-99999 Immediate Wire Required",
+      "body": "Our records show invoice INV-00000 for $4,900.00 for order #ORD-99999 is overdue. Please send payment to our offshore bank account immediately to avoid collections."
+    },
+    "extracted_entities": {
+      "customer_name": "Accounts Payable",
+      "order_id": "ORD-99999",
+      "invoice_id": "INV-00000",
+      "shipping_address": "Unknown",
+      "product_name": "Corporate Consulting Services",
+      "claimed_amount": 4900.00
+    },
+    "erp_database_record": null,
+    "fuzzy_metrics": {
+      "name_similarity": 0.0,
+      "address_similarity": 0.0,
+      "product_similarity": 0.0,
+      "amount_difference": 4900.00,
+      "order_id_exact_match": false
+    },
+    "questions": {
+      "validation_verdict": {
+        "type": "choice",
+        "options": ["verified_match", "minor_typo_accepted", "address_mismatch", "amount_discrepancy", "unauthorized_party", "order_not_found"]
+      },
+      "requires_manual_agent_review": {
+        "type": "noul",
+        "statement": "The extracted email details exhibit substantial discrepancies from the ERP record requiring human agent intervention."
+      },
+      "risk_level": {
+        "type": "score",
+        "levels": ["low_safe", "medium_review", "high_discrepancy", "critical_fraud"]
+      }
+    },
+    "expected_output": {
+      "validation_verdict": "order_not_found",
+      "requires_manual_agent_review": true,
+      "risk_level": "critical_fraud"
+    }
+  },
+  {
+    "case_id": "ORD-VAL-007",
+    "scenario": "Product SKU Mismatch - Customer Claiming Wrong Specification Shipped",
+    "customer_email": {
+      "sender": "robert.miller@enterprise.com",
+      "subject": "Wrong item on invoice INV-7740 (Order ORD-44102)",
+      "body": "Invoice INV-7740 lists the 64GB DDR5 RAM Kit ($220.00), but we ordered the 128GB High-Density Server Kit for order ORD-44102. Robert Miller, DataCenter Ops."
+    },
+    "extracted_entities": {
+      "customer_name": "Robert Miller",
+      "order_id": "ORD-44102",
+      "invoice_id": "INV-7740",
+      "shipping_address": "450 Enterprise Way, San Jose, CA",
+      "product_name": "128GB High-Density Server Kit",
+      "claimed_amount": 220.00
+    },
+    "erp_database_record": {
+      "customer_name": "Robert Miller",
+      "order_id": "ORD-44102",
+      "invoice_id": "INV-7740",
+      "shipping_address": "450 Enterprise Way, Suite 200, San Jose, CA 95134",
+      "product_name": "64GB DDR5 ECC Registered Memory Kit",
+      "order_total": 220.00,
+      "order_status": "delivered"
+    },
+    "fuzzy_metrics": {
+      "name_similarity": 100.0,
+      "address_similarity": 89.2,
+      "product_similarity": 48.1,
+      "amount_difference": 0.00,
+      "order_id_exact_match": true
+    },
+    "questions": {
+      "validation_verdict": {
+        "type": "choice",
+        "options": ["verified_match", "minor_typo_accepted", "address_mismatch", "amount_discrepancy", "unauthorized_party", "order_not_found"]
+      },
+      "requires_manual_agent_review": {
+        "type": "noul",
+        "statement": "The extracted email details exhibit substantial discrepancies from the ERP record requiring human agent intervention."
+      },
+      "risk_level": {
+        "type": "score",
+        "levels": ["low_safe", "medium_review", "high_discrepancy", "critical_fraud"]
+      }
+    },
+    "expected_output": {
+      "validation_verdict": "amount_discrepancy",
+      "requires_manual_agent_review": true,
+      "risk_level": "medium_review"
+    }
+  },
+  {
+    "case_id": "ORD-VAL-008",
+    "scenario": "Corporate Purchase Order with Legal Entity Suffix Variation",
+    "customer_email": {
+      "sender": "procurement@biotech-innovations.de",
+      "subject": "Tax Invoice Verification PO #ORD-90114",
+      "body": "Kindly verify invoice INV-4491 for order ORD-90114. Billed entity: BioTech Innovations International GmbH. Total: 3,450.00 EUR. Shipping to Ludwig-Erhard-Str 14, Frankfurt."
+    },
+    "extracted_entities": {
+      "customer_name": "BioTech Innovations International GmbH",
+      "order_id": "ORD-90114",
+      "invoice_id": "INV-4491",
+      "shipping_address": "Ludwig-Erhard-Str 14, Frankfurt",
+      "product_name": "Centrifuge Rotor Assemblies",
+      "claimed_amount": 3450.00
+    },
+    "erp_database_record": {
+      "customer_name": "BioTech Innovations Int. GmbH & Co. KG",
+      "order_id": "ORD-90114",
+      "invoice_id": "INV-4491",
+      "shipping_address": "Ludwig-Erhard-Strasse 14, 60314 Frankfurt am Main",
+      "product_name": "Precision Centrifuge Rotor Assemblies 24-well",
+      "order_total": 3450.00,
+      "order_status": "fulfilled"
+    },
+    "fuzzy_metrics": {
+      "name_similarity": 88.9,
+      "address_similarity": 86.4,
+      "product_similarity": 80.0,
+      "amount_difference": 0.00,
+      "order_id_exact_match": true
+    },
+    "questions": {
+      "validation_verdict": {
+        "type": "choice",
+        "options": ["verified_match", "minor_typo_accepted", "address_mismatch", "amount_discrepancy", "unauthorized_party", "order_not_found"]
+      },
+      "requires_manual_agent_review": {
+        "type": "noul",
+        "statement": "The extracted email details exhibit substantial discrepancies from the ERP record requiring human agent intervention."
+      },
+      "risk_level": {
+        "type": "score",
+        "levels": ["low_safe", "medium_review", "high_discrepancy", "critical_fraud"]
+      }
+    },
+    "expected_output": {
+      "validation_verdict": "minor_typo_accepted",
+      "requires_manual_agent_review": false,
+      "risk_level": "low_safe"
+    }
+  },
+  {
+    "case_id": "ORD-VAL-009",
+    "scenario": "Third-Party Payer vs Registered Cardholder Discrepancy",
+    "customer_email": {
+      "sender": "suspicious.steve@randommail.org",
+      "subject": "Cancel order ORD-66201 and issue refund to my PayPal",
+      "body": "I am writing regarding order ORD-66201 (INV-1299, $850.00). Please cancel immediately and send the refund to my personal PayPal account: steve99@paypal.me. Thanks, Steve Rogers."
+    },
+    "extracted_entities": {
+      "customer_name": "Steve Rogers",
+      "order_id": "ORD-66201",
+      "invoice_id": "INV-1299",
+      "shipping_address": "Unknown / PayPal Request",
+      "product_name": "Gaming Desktop GPU RTX 4070",
+      "claimed_amount": 850.00
+    },
+    "erp_database_record": {
+      "customer_name": "Katherine O'Connor",
+      "order_id": "ORD-66201",
+      "invoice_id": "INV-1299",
+      "shipping_address": "55 Lakeview Boulevard, Seattle, WA 98101",
+      "product_name": "GeForce RTX 4070 OC Edition",
+      "order_total": 850.00,
+      "order_status": "ready_to_ship"
+    },
+    "fuzzy_metrics": {
+      "name_similarity": 21.0,
+      "address_similarity": 0.0,
+      "product_similarity": 77.8,
+      "amount_difference": 0.00,
+      "order_id_exact_match": true
+    },
+    "questions": {
+      "validation_verdict": {
+        "type": "choice",
+        "options": ["verified_match", "minor_typo_accepted", "address_mismatch", "amount_discrepancy", "unauthorized_party", "order_not_found"]
+      },
+      "requires_manual_agent_review": {
+        "type": "noul",
+        "statement": "The extracted email details exhibit substantial discrepancies from the ERP record requiring human agent intervention."
+      },
+      "risk_level": {
+        "type": "score",
+        "levels": ["low_safe", "medium_review", "high_discrepancy", "critical_fraud"]
+      }
+    },
+    "expected_output": {
+      "validation_verdict": "unauthorized_party",
+      "requires_manual_agent_review": true,
+      "risk_level": "critical_fraud"
+    }
+  },
+  {
+    "case_id": "ORD-VAL-010",
+    "scenario": "Legitimate Cancellation Request within Grace Period",
+    "customer_email": {
+      "sender": "j.thompson@outlook.com",
+      "subject": "Cancel order ORD-33109 placed 15 minutes ago",
+      "body": "Hello, I made a mistake on order ORD-33109 (Invoice INV-8820). I meant to order the wireless version. Total is $75.00 for the Wired Gaming Mouse. James Thompson, 44 Elm St, Denver CO."
+    },
+    "extracted_entities": {
+      "customer_name": "James Thompson",
+      "order_id": "ORD-33109",
+      "invoice_id": "INV-8820",
+      "shipping_address": "44 Elm St, Denver CO",
+      "product_name": "Wired Gaming Mouse",
+      "claimed_amount": 75.00
+    },
+    "erp_database_record": {
+      "customer_name": "James Thompson",
+      "order_id": "ORD-33109",
+      "invoice_id": "INV-8820",
+      "shipping_address": "44 Elm Street, Denver, CO 80202",
+      "product_name": "Pro Wired Gaming Optical Mouse",
+      "order_total": 75.00,
+      "order_status": "pending_fulfillment"
+    },
+    "fuzzy_metrics": {
+      "name_similarity": 100.0,
+      "address_similarity": 91.2,
+      "product_similarity": 82.5,
+      "amount_difference": 0.00,
+      "order_id_exact_match": true
+    },
+    "questions": {
+      "validation_verdict": {
+        "type": "choice",
+        "options": ["verified_match", "minor_typo_accepted", "address_mismatch", "amount_discrepancy", "unauthorized_party", "order_not_found"]
+      },
+      "requires_manual_agent_review": {
+        "type": "noul",
+        "statement": "The extracted email details exhibit substantial discrepancies from the ERP record requiring human agent intervention."
+      },
+      "risk_level": {
+        "type": "score",
+        "levels": ["low_safe", "medium_review", "high_discrepancy", "critical_fraud"]
+      }
+    },
+    "expected_output": {
+      "validation_verdict": "verified_match",
+      "requires_manual_agent_review": false,
+      "risk_level": "low_safe"
+    }
+  }
+]

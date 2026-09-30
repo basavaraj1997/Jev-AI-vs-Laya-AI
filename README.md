@@ -70,15 +70,49 @@ This repository includes **55 production test case input/output examples** spann
 
 Explore the full catalog in [**TEST_CASES.md**](TEST_CASES.md) or inspect the machine-readable dataset in [**test_cases.json**](test_cases.json).
 
+* **Result Sheet (CSV)**: [`test_results.csv`](test_results.csv)
+* **Result Sheet (Markdown)**: [`EVALUATION_RESULTS.md`](EVALUATION_RESULTS.md)
+
 ### Running the Evaluation Suite
 
 ```bash
 # Automated evaluation across all 55 test cases
 python evaluate_dataset.py
 
-# Force live evaluation against local Laya model weights
+# Live evaluation against local Laya model weights
 python evaluate_dataset.py live
 ```
+
+---
+
+## 🧾 Customer Order & Invoice Email Validation (Fuzzy Search + Laya AI)
+
+This suite validates realistic **customer order and invoice email inquiries** against ERP database ground truth records using **fuzzy string matching** combined with **Laya AI System 1 decision evaluation**.
+
+### The Pipeline Architecture
+
+1. **Email Entity Extraction**: Extracts Customer Name, Order ID, Invoice Reference, Shipping Address, Product Description, and Claimed Amount from unstructured customer emails.
+2. **ERP Database Comparison**: Queries the internal database ground truth.
+3. **Fuzzy String Similarity Metrics**:
+   * Customer Name Similarity ratio ($0.0 - 100.0\%$).
+   * Delivery Address Similarity ratio ($0.0 - 100.0\%$).
+   * Product Name Similarity ratio ($0.0 - 100.0\%$).
+   * Absolute Amount Difference ($\$$).
+   * Exact vs. Fuzzy Order ID resolution.
+4. **Laya AI Decision Engine**:
+   * `validation_verdict` (`choice`): `verified_match`, `minor_typo_accepted`, `address_mismatch`, `amount_discrepancy`, `unauthorized_party`, `order_not_found`.
+   * `requires_manual_agent_review` (`noul`): Boolean confidence whether human escalation is required.
+   * `risk_level` (`score`): `low_safe`, `medium_review`, `high_discrepancy`, `critical_fraud`.
+
+### Running the Order Validation Suite
+
+```bash
+python validate_customer_orders.py
+```
+
+* **Dataset**: [`order_validation_cases.json`](order_validation_cases.json)
+* **Result Sheet (CSV)**: [`order_validation_results.csv`](order_validation_results.csv)
+* **Result Sheet (Markdown)**: [`ORDER_VALIDATION_RESULTS.md`](ORDER_VALIDATION_RESULTS.md)
 
 ---
 
