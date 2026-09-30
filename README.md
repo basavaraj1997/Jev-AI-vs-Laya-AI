@@ -1,14 +1,14 @@
 # TypeSafe AI (Jev) vs. Convai Innovations (Laya AI)
 
-> A comprehensive guide, comparison, and local Proof-of-Concept (POC) walkthrough for **System 1 non-autoregressive AI decision engines**.
+> A comprehensive reference guide, architectural comparison, and local evaluation suite for **System 1 non-autoregressive AI decision engines**.
 
 ---
 
 ## 📌 Executive Summary
 
-Traditional Large Language Models (LLMs) like GPT-4, Claude, or LLaMA are **System 2 / autoregressive generative models**: they generate natural language token-by-token. While flexible, they introduce:
+Traditional Large Language Models (LLMs) like GPT-4, Claude, or LLaMA are **System 2 / autoregressive generative models**: they generate natural language token-by-token. While versatile, they introduce:
 * **High latency** (typically 1–5+ seconds per request).
-* **High costs** (billing per input/output token).
+* **High operational costs** (billing per input/output token).
 * **Output non-determinism & schema parsing fragility** (regular expression parsing, JSON repair overhead, hallucination risks).
 
 **TypeSafe AI (Jev)** and **Convai Innovations (Laya AI)** represent the new paradigm of **"System 1" Decision Models**:
@@ -52,6 +52,33 @@ Both Jev and Laya structure their predictions into three primary mathematical de
    * Estimates a continuous score or rank along ordered levels.
    * Returns: Normalized score value and distribution across levels.
    * *Use Cases:* Urgency scoring, customer sentiment, risk index, SLA priority.
+
+---
+
+## 🧪 55+ Test Cases & Evaluation Benchmark Suite
+
+This repository includes **55 production test case input/output examples** spanning **8 enterprise domains**:
+
+* 🗄️ **Infrastructure & IT Incidents** (Database pool exhaustion, BGP route flapping, pod crash loops, disk warnings)
+* 💳 **Billing & Financial Operations** (Duplicate chargebacks, tax invoice requests, SLA refund claims, pricing tiers)
+* 🛡️ **Cybersecurity & Threat Detection** (SQL injection, LLM prompt injection, Tor data exfiltration, BEC phishing)
+* 💬 **Customer Experience & Support** (Account recovery, crash reports, feature requests, SLA breaches)
+* 📦 **E-Commerce & Order Fulfillment** (Porch piracy, incorrect SKU shipments, transit breakage, medical delivery alerts)
+* ⚙️ **DevOps & Engineering Pipelines** (ECR push auth failures, Terraform CIDR conflicts, canary rollbacks, flaky tests)
+* 🚨 **Content Moderation & Trust & Safety** (Crypto spam, doxxing & harassment, physical threats, piracy warez)
+* 🩺 **Healthcare & Clinical Triage** (Acute myocardial infarction, pediatric triage, toxic overdose, stroke code)
+
+Explore the full catalog in [**TEST_CASES.md**](TEST_CASES.md) or inspect the machine-readable dataset in [**test_cases.json**](test_cases.json).
+
+### Running the Evaluation Suite
+
+```bash
+# Automated evaluation across all 55 test cases
+python evaluate_dataset.py
+
+# Force live evaluation against local Laya model weights
+python evaluate_dataset.py live
+```
 
 ---
 
@@ -103,9 +130,9 @@ print("Decision Output:", response)
 
 ---
 
-## 💻 Part 2: Using Laya AI for a Local POC (Zero Cost, 100% Offline)
+## 💻 Part 2: Using Laya AI for Local Execution (Zero Cost, 100% Offline)
 
-Because **Laya AI is open-weight**, it is ideal for local POCs, private enterprise data, air-gapped systems, and developer machines.
+Because **Laya AI is open-weight**, it is ideal for local test environments, private enterprise data, air-gapped systems, and developer machines.
 
 ### 1. Environment Setup
 
@@ -127,60 +154,49 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Local POC Script (`poc_laya.py`)
+### 2. Local Decision Script (`decision_engine.py`)
+
+Run the standalone decision script:
+
+```bash
+python decision_engine.py
+```
+
+Code excerpt:
 
 ```python
 import laya
 
-def main():
-    print("=" * 60)
-    print("  Laya AI (System 1 Decision Engine) - Local POC")
-    print("=" * 60)
+# 1. Load model weights from Hugging Face (cached locally after first run)
+agent = laya.load("convaiinnovations/laya")
 
-    # 1. Load model weights from Hugging Face (cached locally after first run)
-    print("\n[1/3] Loading model: convaiinnovations/laya ...")
-    agent = laya.load("convaiinnovations/laya")
+# 2. Define input state
+state = {
+    "text": "CRITICAL: Database connection pool exhausted on prod-us-east-1. Checkout service returning HTTP 500."
+}
 
-    # 2. Define input state (e.g. system incident, customer message, or log)
-    state = {
-        "text": "CRITICAL: Database connection pool exhausted on prod-us-east-1. Checkout service returning HTTP 500."
-    }
-    print(f"\n[2/3] Input State:\n  \"{state['text']}\"")
+# 3. Define questions schema
+questions = [
+    ("service_domain", {
+        "type": "choice",
+        "options": ["infrastructure", "billing", "frontend_ui", "auth"]
+    }),
+    ("trigger_pagerduty", {
+        "type": "noul",
+        "statement": "This incident indicates a critical production blocker requiring on-call engineer intervention."
+    }),
+    ("severity_level", {
+        "type": "score",
+        "levels": ["P4_low", "P3_medium", "P2_high", "P1_critical"]
+    })
+]
 
-    # 3. Define questions schema
-    questions = [
-        ("service_domain", {
-            "type": "choice",
-            "options": ["infrastructure", "billing", "frontend_ui", "auth"]
-        }),
-        ("trigger_pagerduty", {
-            "type": "noul",
-            "statement": "This incident indicates a critical production blocker requiring on-call engineer intervention."
-        }),
-        ("severity_level", {
-            "type": "score",
-            "levels": ["P4_low", "P3_medium", "P2_high", "P1_critical"]
-        })
-    ]
+# 4. Execute non-autoregressive inference (~33ms)
+result = agent.predict(state, questions)
 
-    # 4. Execute non-autoregressive inference
-    print("\n[3/3] Running inference...")
-    result = agent.predict(state, questions)
-
-    # 5. Display calibrated typed results
-    print("\n" + "-" * 40)
-    print("  RESULTS")
-    print("-" * 40)
-    print(f"Domain Assignment : {result.answers['service_domain'].best}")
-    print(f"All Probabilities : {result.answers['service_domain'].probabilities}")
-    print(f"PagerDuty Alert   : {result.answers['trigger_pagerduty'].probability > 0.7} "
-          f"({result.answers['trigger_pagerduty'].probability:.2%} confidence)")
-    print(f"Severity Score    : {result.answers['severity_level'].value} "
-          f"(Level: {result.answers['severity_level'].best})")
-    print("-" * 40)
-
-if __name__ == "__main__":
-    main()
+print(f"Domain Assignment : {result.answers['service_domain'].best}")
+print(f"PagerDuty Alert   : {result.answers['trigger_pagerduty'].probability > 0.7}")
+print(f"Severity Score    : {result.answers['severity_level'].value}")
 ```
 
 ---
@@ -229,8 +245,4 @@ curl -X POST http://localhost:8000/predict \
   * You do not want to allocate local CPU or GPU memory for model weights.
   * You require turnkey enterprise SLAs from TypeSafe AI.
 
----
 
-## 📄 License
-This repository documentation and POC code are licensed under the [MIT License](LICENSE).
-The Laya model weights and codebase are released under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0) by Convai Innovations.

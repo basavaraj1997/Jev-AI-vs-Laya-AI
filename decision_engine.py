@@ -1,5 +1,6 @@
 """
-Laya AI (System 1 Decision Engine) - Local Proof of Concept (POC)
+Laya AI (System 1 Decision Engine) - Local Execution Suite
+==========================================================
 Demonstrates non-autoregressive decision making with typed outputs:
 - Choice: Categorical classification
 - Noul: Boolean / Propositional verification with calibrated probability
@@ -8,7 +9,7 @@ Demonstrates non-autoregressive decision making with typed outputs:
 
 import sys
 
-def run_poc():
+def run_decision_engine():
     try:
         import laya
     except ImportError:
@@ -18,7 +19,7 @@ def run_poc():
         sys.exit(1)
 
     print("=" * 65)
-    print("  Laya AI (System 1 Decision Model) - Local POC Walkthrough")
+    print("  Laya AI (System 1 Decision Engine) - Local Execution")
     print("=" * 65)
 
     # 1. Load model checkpoint (downloads and caches locally on first execution)
@@ -72,4 +73,4 @@ def run_poc():
     print("=" * 65)
 
 if __name__ == "__main__":
-    run_poc()
+    run_decision_engine()
