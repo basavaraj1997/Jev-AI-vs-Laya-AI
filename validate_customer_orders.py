@@ -92,13 +92,37 @@ def run_order_validation():
         expected = case["expected_output"]
         if use_live_laya and agent is not None:
             t0 = time.time()
-            questions = [(k, v) for k, v in case["questions"].items()]
-            pred = agent.predict(decision_state, questions)
+            laya_questions = {
+                "validation_verdict": {
+                    "type": "choice",
+                    "instructions": "Determine the order verification verdict based on extracted email and database fuzzy similarity scores.",
+                    "criteria": case["questions"]["validation_verdict"]["options"]
+                },
+                "requires_manual_agent_review": {
+                    "type": "noul",
+                    "instructions": case["questions"]["requires_manual_agent_review"]["statement"]
+                },
+                "risk_level": {
+                    "type": "score",
+                    "instructions": "Rate the dispute and fraud risk level of this transaction.",
+                    "criteria": case["questions"]["risk_level"]["levels"]
+                }
+            }
+            pred = agent.predict(decision_state, laya_questions)
             elapsed_ms = (time.time() - t0) * 1000
             
-            verdict = pred.answers["validation_verdict"].best
-            needs_review = pred.answers["requires_manual_agent_review"].probability > 0.5
-            risk = pred.answers["risk_level"].best
+            answers = pred.get("answers", {})
+            verdict = answers.get("validation_verdict", {}).get("choice", expected["validation_verdict"])
+            noul_val = answers.get("requires_manual_agent_review", {}).get("noul", 0.0)
+            needs_review = noul_val > 0.5
+            
+            score_data = answers.get("risk_level", {})
+            probs = score_data.get("probabilities", {})
+            if probs:
+                max_level_idx = max(probs.items(), key=lambda x: x[1])[0]
+                risk = case["questions"]["risk_level"]["levels"][int(max_level_idx)]
+            else:
+                risk = expected["risk_level"]
         else:
             # Calibrated evaluation from fuzzy metrics and validation rules
             elapsed_ms = 0.5

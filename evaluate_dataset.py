@@ -68,20 +68,50 @@ def run_evaluation(mode="auto"):
 
         if use_live_model and agent is not None:
             t0 = time.time()
-            prediction = agent.predict(state, [(k, v) for k, v in questions.items()])
+            laya_questions = {}
+            for q_name, q_def in questions.items():
+                q_type = q_def["type"]
+                if q_type == "choice":
+                    laya_questions[q_name] = {
+                        "type": "choice",
+                        "instructions": f"Select the best category for {q_name}.",
+                        "criteria": q_def.get("criteria", q_def.get("options", []))
+                    }
+                elif q_type == "noul":
+                    laya_questions[q_name] = {
+                        "type": "noul",
+                        "instructions": q_def.get("statement", f"Is {q_name} true?")
+                    }
+                elif q_type == "score":
+                    laya_questions[q_name] = {
+                        "type": "score",
+                        "instructions": f"Rate the level for {q_name}.",
+                        "criteria": q_def.get("criteria", q_def.get("levels", []))
+                    }
+
+            prediction = agent.predict(state, laya_questions)
             lat_ms = (time.time() - t0) * 1000
 
             all_match = True
+            answers = prediction.get("answers", {})
             for q_name, exp_val in expected.items():
-                ans = prediction.answers[q_name]
-                if hasattr(ans, "best"):
-                    val = ans.best
-                elif hasattr(ans, "probability"):
-                    val = ans.probability > 0.5
-                elif hasattr(ans, "value"):
-                    val = ans.value
+                ans = answers.get(q_name, {})
+                q_type = questions[q_name]["type"]
+                if q_type == "choice":
+                    val = ans.get("choice")
+                elif q_type == "noul":
+                    val = ans.get("noul", 0.0) > 0.5
+                elif q_type == "score":
+                    probs = ans.get("probabilities", {})
+                    if probs:
+                        best_idx = max(probs.items(), key=lambda x: x[1])[0]
+                        levels = questions[q_name].get("levels", [])
+                        val = levels[int(best_idx)] if int(best_idx) < len(levels) else str(ans.get("score"))
+                    else:
+                        val = str(ans.get("score"))
                 else:
                     val = str(ans)
+
                 if val != exp_val:
                     all_match = False
             status = "PASSED" if all_match else "EVALUATED"
