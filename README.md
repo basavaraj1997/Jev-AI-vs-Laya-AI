@@ -2,6 +2,10 @@
 
 > The definitive developer guide, architectural benchmark, and local execution reference for **System 1 non-autoregressive AI decision engines**.
 
+> 🚀 **Interactive Local REST API & Swagger UI**:  
+> For the standalone FastAPI service featuring an interactive Swagger UI (`/docs`), 1-click Windows launchers, and pre-built scenario presets, visit:  
+> 👉 [**`github.com/basavaraj1997/locally-run-Convai-Laya-AI`**](https://github.com/basavaraj1997/locally-run-Convai-Laya-AI)
+
 ---
 
 ## 📌 Executive Summary
@@ -228,6 +232,10 @@ curl -X POST http://localhost:8000/predict \
     }
   }'
 ```
+
+> 🌟 **Dedicated Standalone Service with Interactive Swagger UI**:  
+> For the complete FastAPI microservice with automated model caching, interactive Swagger UI (`/docs`), pre-built enterprise presets, and 1-click Windows/PowerShell launchers, check out:  
+> 👉 [**`https://github.com/basavaraj1997/locally-run-Convai-Laya-AI`**](https://github.com/basavaraj1997/locally-run-Convai-Laya-AI)
 
 ---
 
